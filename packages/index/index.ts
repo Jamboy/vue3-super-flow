@@ -1,8 +1,8 @@
-import Graph from "../Graph";
-import GraphMenu from "../menu/menu.vue";
-import GraphNode from "../node/node.vue";
-import GraphLine from "../link/link.vue";
-import MarkLine from "../markLine/markLine.vue";
+import Graph from '../Graph'
+import GraphMenu from '../menu/menu.vue'
+import GraphNode from '../node/node.vue'
+import GraphLine from '../link/link.vue'
+import MarkLine from '../markLine/markLine.vue'
 import { reactive, ref, nextTick } from 'vue'
 
 import {
@@ -13,10 +13,10 @@ import {
   vector,
   debounce,
   arrayReplace,
-} from "../utils";
+} from '../utils'
 
 export default {
-  name: "super-flow",
+  name: 'super-flow',
   props: {
     draggable: {
       type: Boolean,
@@ -24,11 +24,11 @@ export default {
     },
     zoomMax: {
       type: Number,
-      default: 5
+      default: 5,
     },
     zoomMin: {
       type: Number,
-      default: 0.1
+      default: 0.1,
     },
     linkAddable: {
       type: Boolean,
@@ -56,7 +56,7 @@ export default {
     },
     markLineColor: {
       type: String,
-      default: "#55abfc",
+      default: '#55abfc',
     },
     origin: {
       type: Array,
@@ -97,14 +97,15 @@ export default {
   },
   data() {
     return {
-      drift: {  // 漂移值用于处理拖拽
+      drift: {
+        // 漂移值用于处理拖拽
         x: 3,
-        y: 3
+        y: 3,
       },
       drag: {
         mouseDown: false,
         down: {},
-        up: {}
+        up: {},
       }, //  拖拽区域是否按下
       cZoom: 1,
       graph: new Graph({
@@ -137,17 +138,17 @@ export default {
       loaded: false,
       clientWidth: 0,
       clientHeight: 0,
-    };
+    }
   },
   components: {
     GraphMenu,
     GraphNode,
     GraphLine,
-    MarkLine
+    MarkLine,
   },
   computed: {
     maskStyle() {
-      const { top, right, bottom, left } = this.graph.maskBoundingClientRect;
+      const { top, right, bottom, left } = this.graph.maskBoundingClientRect
       return {
         width: `${right - left}px`,
         height: `${bottom - top}px`,
@@ -157,31 +158,32 @@ export default {
     },
   },
   mounted() {
-    document.addEventListener("mouseup", this.docMouseup);
-    document.addEventListener("mousemove", this.docMousemove);
+    document.addEventListener('mouseup', this.docMouseup)
+    document.addEventListener('mousemove', this.docMousemove)
     nextTick(() => {
-      this.graph.initNode(this.nodeList);
-      this.graph.initLink(this.linkList);
-    });
+      this.graph.initNode(this.nodeList)
+      this.graph.initLink(this.linkList)
+    })
   },
   beforeUnmount() {
-    document.removeEventListener("mouseup", this.docMouseup);
-    document.removeEventListener("mousemove", this.docMousemove);
+    document.removeEventListener('mouseup', this.docMouseup)
+    document.removeEventListener('mousemove', this.docMousemove)
   },
   methods: {
     /**
      * @method 实现画布拖拽效果,原理为仅在渲染时，通过计算函数实现元素偏移
-     * @param event 
+     * @param event
      */
     dargCanvas(event: MouseEvent) {
-      if(event.target.id != 'superflow' && event.type != 'mouseup' ) return
+      return
+      if (event.target.id != 'superflow' && event.type != 'mouseup') return
       // drift
       switch (event.type) {
         case 'mousedown':
           this.drag.mouseDown = true
           this.drag.down = {
             dx: event.x,
-            dy: event.y
+            dy: event.y,
           }
 
           break
@@ -201,7 +203,10 @@ export default {
             if (Math.abs(x_cha) > 3 || Math.abs(y_cha) > 3) {
               for (let node of this.graph.nodeList) {
                 let [x, y] = node.position
-                node.position = [this.floatAdd(x, x_cha), this.floatAdd(y, y_cha)]
+                node.position = [
+                  this.floatAdd(x, x_cha),
+                  this.floatAdd(y, y_cha),
+                ]
               }
             }
           }
@@ -214,39 +219,46 @@ export default {
     },
 
     /**
- * 解决两个数相乘精度丢失问题
- * @param a
- * @param b
- * @returns {Number}
- */
+     * 解决两个数相乘精度丢失问题
+     * @param a
+     * @param b
+     * @returns {Number}
+     */
     floatMul(a: number, b: number) {
       var c = 0,
         d = a.toString(),
-        e = b.toString();
+        e = b.toString()
       try {
-        c += d.split(".")[1].length;
-      } catch (f) { }
+        c += d.split('.')[1].length
+      } catch (f) {}
       try {
-        c += e.split(".")[1].length;
-      } catch (f) { }
-      return Number(d.replace(".", "")) * Number(e.replace(".", "")) / Math.pow(10, c);
+        c += e.split('.')[1].length
+      } catch (f) {}
+      return (
+        (Number(d.replace('.', '')) * Number(e.replace('.', ''))) /
+        Math.pow(10, c)
+      )
     },
     floatAdd(a: number, b: number) {
-      var c, d, e;
-      if (undefined == a || null == a || isNaN(a)) { a = 0; }
-      if (undefined == b || null == b || isNaN(b)) { b = 0; }
-      try {
-        c = a.toString().split(".")[1].length;
-      } catch (f) {
-        c = 0;
+      var c, d, e
+      if (undefined == a || null == a || isNaN(a)) {
+        a = 0
+      }
+      if (undefined == b || null == b || isNaN(b)) {
+        b = 0
       }
       try {
-        d = b.toString().split(".")[1].length;
+        c = a.toString().split('.')[1].length
       } catch (f) {
-        d = 0;
+        c = 0
       }
-      e = Math.pow(10, Math.max(c, d));
-      return (this.floatMul(a, e) + this.floatMul(b, e)) / e;
+      try {
+        d = b.toString().split('.')[1].length
+      } catch (f) {
+        d = 0
+      }
+      e = Math.pow(10, Math.max(c, d))
+      return (this.floatMul(a, e) + this.floatMul(b, e)) / e
     },
 
     /**
@@ -273,19 +285,22 @@ export default {
      */
     zoomEvent(e: WheelEvent) {
       e.preventDefault()
-      if (Math.abs(e.deltaX) !== 0 && Math.abs(e.deltaY) !== 0) return console.log('没有固定方向');
-      if (e.deltaX < 0) return console.log('向右');
-      if (e.deltaX > 0) return console.log('向左');
+      if (Math.abs(e.deltaX) !== 0 && Math.abs(e.deltaY) !== 0)
+        return console.log('没有固定方向')
+      if (e.deltaX < 0) return console.log('向右')
+      if (e.deltaX > 0) return console.log('向左')
       if (e.ctrlKey) {
-        if (e.deltaY > 0) { // 双指向内-缩小
+        if (e.deltaY > 0) {
+          // 双指向内-缩小
           this.zoomSub()
         }
-        if (e.deltaY < 0) {  // 双指向外-放大
+        if (e.deltaY < 0) {
+          // 双指向外-放大
           this.zoomAdd()
         }
       } else {
-        if (e.deltaY > 0) return console.log('向上');
-        if (e.deltaY < 0) return console.log('向下');
+        if (e.deltaY > 0) return console.log('向上')
+        if (e.deltaY < 0) return console.log('向下')
       }
     },
     initMenu(menu, source) {
@@ -293,38 +308,38 @@ export default {
         .map((subList) =>
           subList
             .map((item) => {
-              let disable;
-              let hidden;
+              let disable
+              let hidden
 
               if (isFun(item.disable)) {
-                disable = item.disable(source);
+                disable = item.disable(source)
               } else if (isBool(item.disable)) {
-                disable = item.disable;
+                disable = item.disable
               } else {
-                disable = Boolean(item.disable);
+                disable = Boolean(item.disable)
               }
 
               if (isFun(item.hidden)) {
-                hidden = item.hidden(source);
+                hidden = item.hidden(source)
               } else if (isBool(item.hidden)) {
-                hidden = item.hidden;
+                hidden = item.hidden
               } else {
-                hidden = Boolean(item.hidden);
+                hidden = Boolean(item.hidden)
               }
 
               return {
                 ...item,
                 disable,
                 hidden,
-              };
+              }
             })
             .filter((item) => !item.hidden)
         )
-        .filter((sublist) => sublist.length);
+        .filter((sublist) => sublist.length)
     },
 
     showContextMenu(position, list, source) {
-      if (!list.length) return;
+      if (!list.length) return
 
       this.menuConf.position = position
       this.menuConf.list = list
@@ -333,95 +348,95 @@ export default {
       // this.$set(this.menuConf, "position", position);
       // this.$set(this.menuConf, "list", list);
       // this.$set(this.menuConf, "source", source);
-      this.menuConf.visible = true;
+      this.menuConf.visible = true
     },
 
     docMouseup(evt) {
       if (this.moveNodeConf.isMove) {
-        evt.stopPropagation();
-        evt.preventDefault();
+        evt.stopPropagation()
+        evt.preventDefault()
       }
 
-      this.moveNodeConf.isMove = false;
-      this.moveNodeConf.node = null;
-      this.moveNodeConf.offset = null;
-      arrayReplace(this.moveNodeConf.markLine, []);
+      this.moveNodeConf.isMove = false
+      this.moveNodeConf.node = null
+      this.moveNodeConf.offset = null
+      arrayReplace(this.moveNodeConf.markLine, [])
 
-      this.temEdgeConf.visible = false;
-      this.temEdgeConf.link = null;
+      this.temEdgeConf.visible = false
+      this.temEdgeConf.link = null
 
-      this.moveAllConf.isMove = false;
+      this.moveAllConf.isMove = false
     },
 
     docMousemove(evt) {
       if (this.moveNodeConf.isMove) {
-        this.moveNode(evt);
+        this.moveNode(evt)
       } else if (this.temEdgeConf.visible) {
-        this.moveTemEdge(evt);
+        this.moveTemEdge(evt)
       } else if (this.graph.graphSelected) {
-        this.moveWhole(evt);
+        this.moveWhole(evt)
       } else if (this.linkEditable) {
         this.graph.dispatch(
           {
-            type: "mousemove",
+            type: 'mousemove',
             evt: evt,
           },
           true
-        );
+        )
       }
     },
 
     moveNode(evt) {
-      const distance = 10;
-      const conf = this.moveNodeConf;
-      const origin = this.graph.origin;
+      const distance = 10
+      const conf = this.moveNodeConf
+      const origin = this.graph.origin
       const position = vector(conf.offset)
         .differ(getOffset(evt, this.$el))
         .minus(origin)
-        .add([conf.node.width / 2, conf.node.height / 2]).end;
+        .add([conf.node.width / 2, conf.node.height / 2]).end
 
       if (this.hasMarkLine) {
-        const resultList = [];
+        const resultList = []
         conf.verticalList.some((vertical) => {
-          const x = position[0];
-          const result = vertical - distance < x && vertical + distance > x;
+          const x = position[0]
+          const result = vertical - distance < x && vertical + distance > x
 
           if (result) {
-            position[0] = vertical;
-            vertical = Math.floor(vertical);
-            vertical += origin[0];
-            vertical += vertical % 1 === 0 ? 0.5 : 0;
+            position[0] = vertical
+            vertical = Math.floor(vertical)
+            vertical += origin[0]
+            vertical += vertical % 1 === 0 ? 0.5 : 0
             resultList.push([
               [vertical, 0],
               [vertical, this.clientHeight],
-            ]);
+            ])
           }
-          return result;
-        });
+          return result
+        })
         conf.horizontalList.some((horizontal) => {
-          const y = position[1];
-          const result = horizontal - distance < y && horizontal + distance > y;
+          const y = position[1]
+          const result = horizontal - distance < y && horizontal + distance > y
           if (result) {
-            position[1] = horizontal;
-            horizontal = Math.floor(horizontal);
-            horizontal += origin[1];
-            horizontal += horizontal % 1 === 0 ? 0.5 : 0;
+            position[1] = horizontal
+            horizontal = Math.floor(horizontal)
+            horizontal += origin[1]
+            horizontal += horizontal % 1 === 0 ? 0.5 : 0
             resultList.push([
               [0, horizontal],
               [this.clientWidth, horizontal],
-            ]);
+            ])
           }
-          return result;
-        });
+          return result
+        })
 
-        arrayReplace(conf.markLine, resultList);
+        arrayReplace(conf.markLine, resultList)
       }
 
-      conf.node.center = position;
+      conf.node.center = position
     },
 
     moveTemEdge(evt) {
-      this.temEdgeConf.link.movePosition = getOffset(evt, this.$el);
+      this.temEdgeConf.link.movePosition = getOffset(evt, this.$el)
     },
 
     moveWhole(evt) {
@@ -429,85 +444,85 @@ export default {
         const offset = vector(this.moveAllConf.downPosition).differ([
           evt.clientX,
           evt.clientY,
-        ]).end;
+        ]).end
         arrayReplace(
           this.graph.origin,
           vector(this.moveAllConf.origin).add(offset).end
-        );
+        )
       }
     },
 
     contextmenu(evt) {
-      const mouseonLink = this.graph.mouseonLink;
-      const position = getOffset(evt);
-      let list, source;
+      const mouseonLink = this.graph.mouseonLink
+      const position = getOffset(evt)
+      let list, source
 
       if (mouseonLink && mouseonLink.isPointInLink(position)) {
-        list = this.initMenu(this.linkMenu, mouseonLink);
-        source = mouseonLink;
+        list = this.initMenu(this.linkMenu, mouseonLink)
+        source = mouseonLink
       } else {
-        if (mouseonLink) this.graph.mouseonLink = null;
-        list = this.initMenu(this.graphMenu, this.graph);
-        source = this.graph;
+        if (mouseonLink) this.graph.mouseonLink = null
+        list = this.initMenu(this.graphMenu, this.graph)
+        source = this.graph
       }
 
-      this.showContextMenu(position, list, source);
+      this.showContextMenu(position, list, source)
     },
 
     nodeMousedown(node, offset) {
       if (this.draggable) {
-        this.clientWidth = this.$el.clientWidth;
-        this.clientHeight = this.$el.clientHeight;
+        this.clientWidth = this.$el.clientWidth
+        this.clientHeight = this.$el.clientHeight
 
-        const verticalList = this.moveNodeConf.verticalList;
-        const horizontalList = this.moveNodeConf.horizontalList;
+        const verticalList = this.moveNodeConf.verticalList
+        const horizontalList = this.moveNodeConf.horizontalList
 
         const centerList = this.graph.nodeList
           .filter((item) => item !== node)
-          .map((node) => node.center);
+          .map((node) => node.center)
 
         arrayReplace(
           verticalList,
           [...new Set(centerList.map((center) => center[0]))].sort(
             (prev, next) => prev - next
           )
-        );
+        )
 
         arrayReplace(
           horizontalList,
           [...new Set(centerList.map((center) => center[1]))].sort(
             (prev, next) => prev - next
           )
-        );
+        )
 
-        this.moveNodeConf.isMove = true;
-        this.moveNodeConf.node = node;
-        this.moveNodeConf.offset = offset;
+        this.moveNodeConf.isMove = true
+        this.moveNodeConf.node = node
+        this.moveNodeConf.offset = offset
       }
     },
 
     nodeMouseenter(evt, node, offset) {
-      const link = this.temEdgeConf.link;
+      const link = this.temEdgeConf.link
       if (this.enterIntercept(link.start, node, this.graph)) {
-        link.end = node;
-        link.endAt = offset;
+        link.end = node
+        link.endAt = offset
       }
     },
 
     nodeMouseleave() {
-      this.temEdgeConf.link.end = null;
+      this.temEdgeConf.link.end = null
     },
 
     nodeMouseup() {
-      this.graph.addLink(this.temEdgeConf.link);
+      this.graph.addLink(this.temEdgeConf.link)
       var { start, _end } = this.temEdgeConf.link
       console.log('绑定关系:', '起点', start, '终点', _end)
       start.childrens.push(_end)
     },
 
     nodeContextmenu(evt, node) {
-      const list = this.initMenu(this.nodeMenu, node);
-      if (!list.length) return;
+      const list = this.initMenu(this.nodeMenu, node)
+      if (!list.length) return
 
       this.menuConf.position = getOffset(evt, this.$el)
       this.menuConf.list = list
@@ -515,7 +530,7 @@ export default {
       // this.$set(this.menuConf, "position", );
       // this.$set(this.menuConf, "list", list);
       // this.$set(this.menuConf, "source", node);
-      this.menuConf.visible = true;
+      this.menuConf.visible = true
     },
 
     sideMousedown(evt, node, startAt) {
@@ -524,78 +539,78 @@ export default {
         const link = this.graph.createLink({
           start: node,
           startAt,
-        });
-        link.movePosition = getOffset(evt, this.$el);
+        })
+        link.movePosition = getOffset(evt, this.$el)
         this.temEdgeConf.link = link
-        this.temEdgeConf.visible = true;
+        this.temEdgeConf.visible = true
       }
     },
 
     nodeIntercept(node) {
-      return () => this.outputIntercept(node, this.graph);
+      return () => this.outputIntercept(node, this.graph)
     },
 
     menuItemSelect() {
-      this.menuConf.visible = false;
+      this.menuConf.visible = false
     },
 
     selectAllMaskMouseDown(evt) {
-      this.moveAllConf.isMove = true;
-      this.moveAllConf.origin = [...this.graph.origin];
-      this.moveAllConf.downPosition = [evt.clientX, evt.clientY];
+      this.moveAllConf.isMove = true
+      this.moveAllConf.origin = [...this.graph.origin]
+      this.moveAllConf.downPosition = [evt.clientX, evt.clientY]
     },
 
     selectedAll() {
-      this.graph.selectAll();
+      this.graph.selectAll()
     },
 
     toJSON() {
-      return this.graph.toJSON();
+      return this.graph.toJSON()
     },
 
     getMouseCoordinate(clientX, clientY) {
-      const offset = getOffset({ clientX, clientY }, this.$el);
-      return vector(offset).minus(this.graph.origin).end;
+      const offset = getOffset({ clientX, clientY }, this.$el)
+      return vector(offset).minus(this.graph.origin).end
     },
 
     addNode(options) {
-      return this.graph.addNode(options);
+      return this.graph.addNode(options)
     },
   },
   watch: {
-    "graph.graphSelected"() {
+    'graph.graphSelected'() {
       if (this.graph.graphSelected) {
         nextTick(() => {
-          this.$refs.selectAllMask.focus();
-        });
+          this.$refs.selectAllMask.focus()
+        })
       }
     },
-    "graph.mouseonLink"() {
+    'graph.mouseonLink'() {
       if (this.graph.mouseonLink) {
-        document.body.style.cursor = "pointer";
+        document.body.style.cursor = 'pointer'
       } else {
-        document.body.style.cursor = "";
+        document.body.style.cursor = ''
       }
     },
     origin() {
-      this.graph.origin = this.origin || [];
+      this.graph.origin = this.origin || []
     },
     nodeList: {
       handler() {
-        this.graph.initNode(this.nodeList);
+        this.graph.initNode(this.nodeList)
         // 增加节点时，重新渲染线，避免同时修改渲染link时缺少node节点，导致线不显示
-        this.graph.initLink(this.linkList);
+        this.graph.initLink(this.linkList)
       },
-      deep: true
+      deep: true,
     },
     linkList: {
       handler() {
-        this.graph.initLink(this.linkList);
+        this.graph.initLink(this.linkList)
       },
-      deep: true
+      deep: true,
     },
   },
   install(Vue) {
-    Vue.component(this.name, this);
+    Vue.component(this.name, this)
   },
-};
+}

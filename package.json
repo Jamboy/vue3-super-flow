@@ -1,7 +1,7 @@
 {
-  "name": "vue3-super-flow",
-  "main": "/dist/vue3-super-flow.es.js",
-  "version": "0.1.5",
+  "name": "vue3-super-flow-jam",
+  "main": "/dist/vue3-super-flow-jam.es.js",
+  "version": "0.1.6",
   "scripts": {
     "dev": "vite",
     "ck-build": "vue-tsc --noEmit && vite build",
@@ -21,5 +21,11 @@
     "typescript": "^4.3.2",
     "vite": "^2.3.8",
     "vue-tsc": "^0.0.24"
-  }
+  },
+  "description": "使用方式和vue-super-flow相同。 仅做了v3的移植和部分问题修复，以及添加一些特定新功能。",
+  "directories": {
+    "example": "examples"
+  },
+  "author": "",
+  "license": "ISC"
 }
