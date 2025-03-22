@@ -28,7 +28,7 @@ export default {
     },
     zoomMin: {
       type: Number,
-      default: 0.1,
+      default: 0.5,
     },
     linkAddable: {
       type: Boolean,
@@ -266,7 +266,7 @@ export default {
      */
     zoomAdd() {
       if (this.cZoom < this.zoomMax) {
-        this.cZoom = this.floatAdd(this.cZoom, 0.01)
+        this.cZoom = this.floatAdd(this.cZoom, 0.1)
       }
     },
 
@@ -276,7 +276,7 @@ export default {
     zoomSub() {
       if (this.cZoom > this.zoomMin) {
         // 不能直接相加,小数相加会有精度问题
-        this.cZoom = this.floatAdd(this.cZoom, -0.01)
+        this.cZoom = this.floatAdd(this.cZoom, -0.1)
       }
     },
 
