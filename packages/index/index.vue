@@ -12,7 +12,7 @@
     @mousemove="dargCanvas"
     @mouseup="dargCanvas"
     @wheel="zoomEvent"
-    :style="`transform: scale(${cZoom});transform-origin: left;transform-origin: 0% 0%`"
+    :style="`zoom: ${cZoom}`"
     @contextmenu.prevent.stop="contextmenu"
   >
     <graph-line
