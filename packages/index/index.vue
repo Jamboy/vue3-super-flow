@@ -12,9 +12,9 @@
     @mousemove="dargCanvas"
     @mouseup="dargCanvas"
     @wheel="zoomEvent"
-    :style="`zoom: ${cZoom}`"
-    @contextmenu.prevent.stop="contextmenu">
-
+    :style="`transform: scale(${cZoom});transform-origin: left;transform-origin: 0% 0%`"
+    @contextmenu.prevent.stop="contextmenu"
+  >
     <graph-line
       v-if="temEdgeConf.visible"
       :padding="linkPadding"
@@ -22,7 +22,8 @@
       :link="temEdgeConf.link"
       :link-base-style="linkBaseStyle"
       :link-desc="linkDesc"
-      :link-style="linkStyle">
+      :link-style="linkStyle"
+    >
     </graph-line>
 
     <graph-line
@@ -34,7 +35,8 @@
       :key="edge.key"
       :link-base-style="linkBaseStyle"
       :link-desc="linkDesc"
-      :link-style="linkStyle">
+      :link-style="linkStyle"
+    >
     </graph-line>
 
     <mark-line
@@ -42,7 +44,8 @@
       :width="clientWidth"
       :height="clientHeight"
       :mark-color="markLineColor"
-      :markLine="moveNodeConf.markLine">
+      :markLine="moveNodeConf.markLine"
+    >
     </mark-line>
 
     <graph-node
@@ -62,12 +65,10 @@
       @node-mouseleave="nodeMouseleave"
       @node-mouseup="nodeMouseup"
       @side-mousedown="sideMousedown"
-      @node-contextmenu="nodeContextmenu">
-      <template v-slot="{meta}"  >
-        <slot
-          name="node"
-          :meta="meta">
-        </slot>
+      @node-contextmenu="nodeContextmenu"
+    >
+      <template v-slot="{ meta }">
+        <slot name="node" :meta="meta"> </slot>
       </template>
     </graph-node>
 
@@ -76,12 +77,10 @@
       :graph="graph"
       :position="menuConf.position"
       :list="menuConf.list"
-      :source="menuConf.source">
-      <template v-slot="{item}">
-        <slot
-          name="menuItem"
-          :item="item">
-        </slot>
+      :source="menuConf.source"
+    >
+      <template v-slot="{ item }">
+        <slot name="menuItem" :item="item"> </slot>
       </template>
     </graph-menu>
 
@@ -93,18 +92,16 @@
       @blur="graph.graphSelected = false"
       v-show="graph.graphSelected"
       @mousedown="selectAllMaskMouseDown"
-      @contextmenu.prevent.stop>
-    </div>
+      @contextmenu.prevent.stop
+    ></div>
   </div>
 </template>
 
-<script lang='ts'>
-  import main from './index.ts'
-  export default main
+<script lang="ts">
+import main from './index.ts'
+export default main
 </script>
 
-<style  lang="less">
-  @import './index.less';
+<style lang="less">
+@import './index.less';
 </style>
-
-

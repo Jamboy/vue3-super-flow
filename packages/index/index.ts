@@ -212,7 +212,6 @@ export default {
           }
           break
         case 'mouseup':
-          console.log('抬起')
           this.drag.mouseDown = false
           break
       }
@@ -285,10 +284,9 @@ export default {
      */
     zoomEvent(e: WheelEvent) {
       e.preventDefault()
-      if (Math.abs(e.deltaX) !== 0 && Math.abs(e.deltaY) !== 0)
-        return console.log('没有固定方向')
-      if (e.deltaX < 0) return console.log('向右')
-      if (e.deltaX > 0) return console.log('向左')
+      if (Math.abs(e.deltaX) !== 0 && Math.abs(e.deltaY) !== 0) return
+      if (e.deltaX < 0) return
+      if (e.deltaX > 0) return
       if (e.ctrlKey) {
         if (e.deltaY > 0) {
           // 双指向内-缩小
@@ -299,8 +297,8 @@ export default {
           this.zoomAdd()
         }
       } else {
-        if (e.deltaY > 0) return console.log('向上')
-        if (e.deltaY < 0) return console.log('向下')
+        if (e.deltaY > 0) return
+        if (e.deltaY < 0) return
       }
     },
     initMenu(menu, source) {
@@ -359,6 +357,7 @@ export default {
 
       this.moveNodeConf.isMove = false
       this.moveNodeConf.node = null
+
       this.moveNodeConf.offset = null
       arrayReplace(this.moveNodeConf.markLine, [])
 
@@ -391,15 +390,17 @@ export default {
       const conf = this.moveNodeConf
       const origin = this.graph.origin
       const position = vector(conf.offset)
-        .differ(getOffset(evt, this.$el))
+        .differ(getOffset(evt, this.$el).map((v) => v / this.cZoom))
         .minus(origin)
         .add([conf.node.width / 2, conf.node.height / 2]).end
 
       if (this.hasMarkLine) {
         const resultList = []
         conf.verticalList.some((vertical) => {
+          const scaledVertical = vertical * this.cZoom // 缩放补偿
           const x = position[0]
-          const result = vertical - distance < x && vertical + distance > x
+          const result =
+            scaledVertical - distance < x && scaledVertical + distance > x
 
           if (result) {
             position[0] = vertical
@@ -432,11 +433,30 @@ export default {
         arrayReplace(conf.markLine, resultList)
       }
 
-      conf.node.center = position
+      // 两个数组，计算它们的差
+
+      const oldPosition = this.moveNodeConf.node.center.map(
+        (v) => v / this.cZoom
+      )
+      if (this.isNeedMove(position, oldPosition)) {
+        conf.node.center = position
+      }
+    },
+
+    isNeedMove(currentPosition: number[], oldPosition: number[]) {
+      const isNeedMove =
+        Math.abs(currentPosition[0] - oldPosition[0]) > 10 ||
+        Math.abs(currentPosition[1] - oldPosition[1]) > 10
+
+      return isNeedMove
     },
 
     moveTemEdge(evt) {
-      this.temEdgeConf.link.movePosition = getOffset(evt, this.$el)
+      this.temEdgeConf.link.movePosition = this.getOffsetByZoom(evt, this.$el)
+    },
+
+    getOffsetByZoom(evt, node = null) {
+      return getOffset(evt, node).map((v) => v / this.cZoom)
     },
 
     moveWhole(evt) {
@@ -454,7 +474,7 @@ export default {
 
     contextmenu(evt) {
       const mouseonLink = this.graph.mouseonLink
-      const position = getOffset(evt)
+      const position = this.getOffsetByZoom(evt)
       let list, source
 
       if (mouseonLink && mouseonLink.isPointInLink(position)) {
@@ -469,8 +489,13 @@ export default {
       this.showContextMenu(position, list, source)
     },
 
-    nodeMousedown(node, offset) {
+    async nodeMousedown(node, offset) {
       if (this.draggable) {
+        await nextTick()
+        const rect = this.$el.getBoundingClientRect()
+        this.moveNodeConf.startX = (offset.x - rect.left) / this.cZoom
+        this.moveNodeConf.startY = (offset.y - rect.top) / this.cZoom
+
         this.clientWidth = this.$el.clientWidth
         this.clientHeight = this.$el.clientHeight
 
@@ -497,6 +522,7 @@ export default {
 
         this.moveNodeConf.isMove = true
         this.moveNodeConf.node = node
+
         this.moveNodeConf.offset = offset
       }
     },
@@ -516,7 +542,7 @@ export default {
     nodeMouseup() {
       this.graph.addLink(this.temEdgeConf.link)
       var { start, _end } = this.temEdgeConf.link
-      console.log('绑定关系:', '起点', start, '终点', _end)
+
       start.childrens.push(_end)
     },
 
@@ -524,7 +550,7 @@ export default {
       const list = this.initMenu(this.nodeMenu, node)
       if (!list.length) return
 
-      this.menuConf.position = getOffset(evt, this.$el)
+      this.menuConf.position = this.getOffsetByZoom(evt, this.$el)
       this.menuConf.list = list
       this.menuConf.source = node
       // this.$set(this.menuConf, "position", );
@@ -534,13 +560,12 @@ export default {
     },
 
     sideMousedown(evt, node, startAt) {
-      console.log('边缘按下', evt, node, startAt)
       if (this.linkAddable) {
         const link = this.graph.createLink({
           start: node,
           startAt,
         })
-        link.movePosition = getOffset(evt, this.$el)
+        link.movePosition = this.getOffsetByZoom(evt, this.$el)
         this.temEdgeConf.link = link
         this.temEdgeConf.visible = true
       }
