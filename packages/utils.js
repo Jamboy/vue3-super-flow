@@ -4,51 +4,41 @@
  * Time: 14:03
  */
 
-
 export function uuid(before = '', after = '') {
-  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('')
+  const chars =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('')
   const charsLen = chars.length
   let uuid = []
   const len = 16
   for (let i = 0; i < len; i++) {
-    uuid[i] = chars[0 | Math.random() * charsLen]
+    uuid[i] = chars[0 | (Math.random() * charsLen)]
   }
   return before + uuid.join('') + after
 }
 
+// 您的代码
 
+/**
+ * 获取鼠标事件相对于目标元素的偏移坐标
+ * @param {Event} evt - 鼠标事件对象
+ * @param {HTMLElement} [target=null] - 目标元素,默认为事件的currentTarget
+ * @returns {Array<number>} 返回相对坐标 [x, y]
+ */
 export function getOffset(evt, target = null) {
-  const {
-    clientX,
-    clientY,
-    currentTarget
-  } = evt
-  
+  const { clientX, clientY, currentTarget } = evt
+
   const current = target || currentTarget
-  
-  const {
-    left,
-    top
-  } = current.getBoundingClientRect()
-  
+
+  const { left, top } = current.getBoundingClientRect()
+
   return [clientX - left, clientY - top]
 }
 
+export function isIntersect({ clientX, clientY }, target) {
+  const { top, right, bottom, left } = target.getBoundingClientRect()
 
-export function isIntersect({clientX, clientY}, target) {
-  const {
-    top,
-    right,
-    bottom,
-    left
-  } = target.getBoundingClientRect()
-  
-  return top < clientY
-    && right > clientX
-    && bottom > clientY
-    && left < clientX
+  return top < clientY && right > clientX && bottom > clientY && left < clientX
 }
-
 
 // 向量相加
 export function addVector(vectorA, vectorB) {
@@ -91,7 +81,7 @@ export function equals(vector, target) {
 
 // 向量夹角
 export function angle(vector) {
-  return Math.round(180 / Math.PI * Math.atan2(vector[1], vector[0])) + 180
+  return Math.round((180 / Math.PI) * Math.atan2(vector[1], vector[0])) + 180
 }
 
 // 判断向量是否平行
@@ -121,30 +111,29 @@ export function vector(result) {
     unitVector,
     equals,
     angle,
-    parallel
+    parallel,
   }
   const proxyHandler = {}
-  
-  Object.keys(handler).forEach(key => {
+
+  Object.keys(handler).forEach((key) => {
     Object.defineProperty(proxyHandler, key, {
       get() {
         return function (val) {
           result = handler[key](result, val)
           return proxyHandler
         }
-      }
+      },
     })
   })
-  
+
   Object.defineProperty(proxyHandler, 'end', {
     get() {
       return result
-    }
+    },
   })
-  
+
   return proxyHandler
 }
-
 
 export function toRawType(val) {
   return Object.prototype.toString.call(val).slice(8, -1).toLocaleLowerCase()
@@ -174,11 +163,32 @@ export function arrayReplace(arr1, arr2) {
   arr1.splice(0, arr1.length, ...arr2)
 }
 
-export function debounce(fn, timestamp) {
-  let timeout = null
-  return function () {
-    if (timeout)
-      clearTimeout(timeout)
-    timeout = setTimeout(fn, timestamp)
+// WARNING: This is not a drop in replacement solution and
+// it might not work for some edge cases. Test your code!
+export const debounce = (func, delay, { leading } = {}) => {
+  let timerId
+  let shouldInvoke
+
+  return (...args) => {
+    shouldInvoke = true
+
+    if (!timerId && leading) {
+      func(...args)
+      shouldInvoke = false
+    }
+    clearTimeout(timerId)
+
+    timerId = setTimeout(() => shouldInvoke && func(...args), delay)
+  }
+}
+
+export const throttle = (fn, delay) => {
+  let lastCall = 0
+  return (...args) => {
+    const now = Date.now()
+    if (now - lastCall >= delay) {
+      fn(...args)
+      lastCall = now
+    }
   }
 }

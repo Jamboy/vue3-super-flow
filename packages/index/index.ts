@@ -278,7 +278,9 @@ export default {
         this.cZoom = this.floatAdd(this.cZoom, -0.1)
       }
     },
-
+    zoomRest() {
+      this.cZoom = 1
+    },
     /**
      * @method 缩小与放大
      */
