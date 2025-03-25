@@ -14,6 +14,7 @@
     @wheel="zoomEvent"
     :style="`zoom: ${cZoom}`"
     @contextmenu.prevent.stop="contextmenu"
+    @dblclick="selectedAll"
   >
     <graph-line
       v-if="temEdgeConf.visible"
