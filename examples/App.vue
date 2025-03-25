@@ -6,8 +6,10 @@
 <template>
   <h3>demo:</h3>
   <button @click="select">全悬</button>
+  <button @click="addSubNode">add sub node</button>
   <div class="super-flow-base-demo">
     <super-flow
+      :style="canvasStyle"
       ref="superFlow"
       :node-list="nodeList"
       :link-list="linkList"
@@ -457,10 +459,23 @@ export default {
     },
 
     select() {
-      // this.$refs.superFlow.selectAll()
-      console.log('this.$refs.superFlow: ', this.$refs.superFlow)
-      console.log('this.$refs.superFlow: ', this.$refs.superFlow.toJSON())
-      console.log('this.$refs.superFlow: ', this.$refs.superFlow.selectedAll())
+      this.$refs.superFlow.graph.selectAll()
+      // console.log('this.$refs.superFlow: ', this.$refs.superFlow)
+      // console.log('this.$refs.superFlow: ', this.$refs.superFlow.toJSON())
+      // console.log('this.$refs.superFlow: ', this.$refs.superFlow.selectedAll())
+    },
+    addSubNode() {
+      const node = {
+        id: 'node' + new Date().getTime(),
+        width: 160,
+        height: 80,
+        coordinate: [34, -209],
+        meta: {
+          prop: 'cc',
+          name: '抄送节点',
+        },
+      }
+      this.nodeList.push(node)
     },
   },
 }
