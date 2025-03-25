@@ -1,7 +1,7 @@
 {
   "name": "vue3-super-flow-jam",
   "main": "/dist/vue3-super-flow-jam.es.js",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "scripts": {
     "dev": "vite",
     "ck-build": "vue-tsc --noEmit && vite build",
